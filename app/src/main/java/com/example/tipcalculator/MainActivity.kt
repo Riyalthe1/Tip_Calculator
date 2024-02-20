@@ -3,6 +3,7 @@ package com.example.tipcalculator
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -10,9 +11,17 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material3.Card
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
@@ -22,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.TextStyle
@@ -61,7 +71,7 @@ fun TipCalculator() {
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = false)
 @Composable
 fun TotalHeader(amount: Float = 0f) {
     Surface(
@@ -96,9 +106,15 @@ fun TotalHeader(amount: Float = 0f) {
     }
 }
 
+@Preview(showBackground = true)
+@Composable
+fun UserInputPreview() {
+    UserInputArea(amount = "12", amountChange = {}, 1,{})
+}
+
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun UserInputArea(amount: String, amountChange: (String) -> Unit) {
+fun UserInputArea(amount: String, amountChange: (String) -> Unit, personCounter: Int, onAddOrReducePerson:(Int)-> Unit) {
     val keyboardController = LocalSoftwareKeyboardController.current
     Surface(
         modifier = Modifier
@@ -128,13 +144,53 @@ fun UserInputArea(amount: String, amountChange: (String) -> Unit) {
                     keyboardController?.hide()
                 })
             )
-            Spacer(modifier = Modifier.height(8.dp))
-            Row (modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 12.dp), verticalAlignment = Alignment.CenterVertically){
-Text(text = "Split", style = MaterialTheme.typography.bodyMedium)
+            Spacer(modifier = Modifier.height(4.dp))
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp), verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(text = "Split", style = MaterialTheme.typography.bodyMedium)
                 Spacer(modifier = Modifier.fillMaxWidth(.5f))
+                CustomButton(imageVector = Icons.Default.KeyboardArrowUp) {
+                    onAddOrReducePerson.invoke(1)
+                }
+                Text(
+                    text = "${personCounter}",
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(horizontal = 8.dp)
+                )
+                CustomButton(imageVector = Icons.Default.KeyboardArrowDown) {
+                    onAddOrReducePerson.invoke(-1)
+                }
             }
+
         }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewCustomButton() {
+    CustomButton(imageVector = Icons.Default.KeyboardArrowDown) {
+
+    }
+}
+
+@Composable
+fun CustomButton(imageVector: ImageVector, onClick: () -> Unit) {
+    Card(
+        modifier = Modifier
+            .wrapContentSize()
+            .padding(12.dp)
+            .clickable { onClick.invoke() }, shape = CircleShape
+    ) {
+        Icon(
+            imageVector = imageVector,
+            contentDescription = null,
+            modifier = Modifier
+                .size(30.dp)
+                .padding(4.dp)
+        )
     }
 }
